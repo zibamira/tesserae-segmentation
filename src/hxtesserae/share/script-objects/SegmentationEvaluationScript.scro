@@ -1,0 +1,160 @@
+## Amira-Script-Object V3.0
+
+# Goal: Apply HxSegmentationEvaluation to 5 segmentations (all segmentations are
+# compared with all other segmentations).
+# Writes all VI / RAND values to the console.
+# Needs exactly 5 label fields / segmentations and one mask.
+# Input label fields are internally converted to 16 Bit unsigned labels (required by
+# HxSegmentationEvaluation).
+# Background voxels (value = 0) in the masked area are taken into calculation and
+# treated as all other labels. It does not matter if there are labels with no voxels
+# inside the masked region.
+
+$this proc constructor {} {
+    $this data setLabel "Label Field 1"
+
+    $this newPortConnection labelField2 HxUniformScalarField3
+    $this labelField2 setLabel "Label Field 2"
+
+    $this newPortConnection labelField3 HxUniformScalarField3
+    $this labelField3 setLabel "Label Field 3"
+
+    $this newPortConnection labelField4 HxUniformScalarField3
+    $this labelField4 setLabel "Label Field 4"
+
+    $this newPortConnection labelField5 HxUniformScalarField3
+    $this labelField5 setLabel "Label Field 5"
+
+    $this newPortConnection mask HxUniformScalarField3
+    $this mask setLabel "Mask"
+
+    $this newPortDoIt doit
+    $this doit setCmd 0 {$this start}
+}
+
+$this proc destructor {} {
+}
+
+$this proc compute {} {
+}
+
+$this proc start {} {
+
+    # Read input data
+    set labels1 [$this data source]
+    set labels2 [$this labelField2 source]
+    set labels3 [$this labelField3 source]
+    set labels4 [$this labelField4 source]
+    set labels5 [$this labelField5 source]
+    set maskValues [$this mask source]
+
+    set numberOfLabelfields 5
+
+    # Convert to unsigned 16 bit
+    set castFieldModule [create HxCastField]
+    $castFieldModule outputType setValue 7
+
+    $castFieldModule data connect $labels1
+    $castFieldModule action setValue 0
+    $castFieldModule fire
+    set labels1_16Bit [$castFieldModule getResult]
+    $labels1_16Bit master disconnect
+
+    $castFieldModule data connect $labels2
+    $castFieldModule action setValue 0
+    $castFieldModule fire
+    set labels2_16Bit [$castFieldModule getResult]
+    $labels2_16Bit master disconnect
+
+    $castFieldModule data connect $labels3
+    $castFieldModule action setValue 0
+    $castFieldModule fire
+    set labels3_16Bit [$castFieldModule getResult]
+    $labels3_16Bit master disconnect
+
+    $castFieldModule data connect $labels4
+    $castFieldModule action setValue 0
+    $castFieldModule fire
+    set labels4_16Bit [$castFieldModule getResult]
+    $labels4_16Bit master disconnect
+
+    $castFieldModule data connect $labels5
+    $castFieldModule action setValue 0
+    $castFieldModule fire
+    set labels5_16Bit [$castFieldModule getResult]
+    $labels5_16Bit master disconnect
+
+    # Compute VI and RAND values
+    set segmentationQualityModule [create HxSegmentationEvaluation]
+    $segmentationQualityModule mask connect $maskValues
+
+    $segmentationQualityModule data connect $labels1_16Bit
+    $segmentationQualityModule groundTruthSegmentation connect $labels2_16Bit
+    eval set vi [$segmentationQualityModule getVI]
+    eval set rand [$segmentationQualityModule getRandIndex]
+    echo "VI for label fields 1/2:" $vi " / RAND 1/2:" $rand
+    echo " "
+
+    $segmentationQualityModule data connect $labels1_16Bit
+    $segmentationQualityModule groundTruthSegmentation connect $labels3_16Bit
+    eval set vi [$segmentationQualityModule getVI]
+    eval set rand [$segmentationQualityModule getRandIndex]
+    echo "VI for label fields 1/3:" $vi " / RAND 1/3:" $rand
+    echo " "
+
+    $segmentationQualityModule data connect $labels1_16Bit
+    $segmentationQualityModule groundTruthSegmentation connect $labels4_16Bit
+    eval set vi [$segmentationQualityModule getVI]
+    eval set rand [$segmentationQualityModule getRandIndex]
+    echo "VI for label fields 1/4:" $vi " / RAND 1/4:" $rand
+    echo " "
+
+    $segmentationQualityModule data connect $labels1_16Bit
+    $segmentationQualityModule groundTruthSegmentation connect $labels5_16Bit
+    eval set vi [$segmentationQualityModule getVI]
+    eval set rand [$segmentationQualityModule getRandIndex]
+    echo "VI for label fields 1/5:" $vi " / RAND 1/5:" $rand
+    echo " "
+
+    $segmentationQualityModule data connect $labels2_16Bit
+    $segmentationQualityModule groundTruthSegmentation connect $labels3_16Bit
+    eval set vi [$segmentationQualityModule getVI]
+    eval set rand [$segmentationQualityModule getRandIndex]
+    echo "VI for label fields 2/3:" $vi " / RAND 2/3:" $rand
+    echo " "
+
+    $segmentationQualityModule data connect $labels2_16Bit
+    $segmentationQualityModule groundTruthSegmentation connect $labels4_16Bit
+    eval set vi [$segmentationQualityModule getVI]
+    eval set rand [$segmentationQualityModule getRandIndex]
+    echo "VI for label fields 2/4:" $vi " / RAND 2/4:" $rand
+    echo " "
+
+    $segmentationQualityModule data connect $labels2_16Bit
+    $segmentationQualityModule groundTruthSegmentation connect $labels5_16Bit
+    eval set vi [$segmentationQualityModule getVI]
+    eval set rand [$segmentationQualityModule getRandIndex]
+    echo "VI for label fields 2/5:" $vi " / RAND 2/5:" $rand
+    echo " "
+
+    $segmentationQualityModule data connect $labels3_16Bit
+    $segmentationQualityModule groundTruthSegmentation connect $labels4_16Bit
+    eval set vi [$segmentationQualityModule getVI]
+    eval set rand [$segmentationQualityModule getRandIndex]
+    echo "VI for label fields 3/4:" $vi " / RAND 3/4:" $rand
+    echo " "
+
+    $segmentationQualityModule data connect $labels3_16Bit
+    $segmentationQualityModule groundTruthSegmentation connect $labels5_16Bit
+    eval set vi [$segmentationQualityModule getVI]
+    eval set rand [$segmentationQualityModule getRandIndex]
+    echo "VI for label fields 3/5:" $vi " / RAND 3/5:" $rand
+    echo " "
+
+    $segmentationQualityModule data connect $labels4_16Bit
+    $segmentationQualityModule groundTruthSegmentation connect $labels5_16Bit
+    eval set vi [$segmentationQualityModule getVI]
+    eval set rand [$segmentationQualityModule getRandIndex]
+    echo "VI for label fields 4/5:" $vi " / RAND 4/5:" $rand
+    echo " "
+}

@@ -1,0 +1,37 @@
+\begin{hxmodule2}{Landmark evaluation}{This module evaluates a segmentation, given as a uniform scalar field, against a set of landmarks.}
+
+\hxlabel{HxMTLandmarkEvaluation}
+\hxfeatureid{HxMTLandmarkEvaluation}
+
+\begin{hxdescription}
+This module evaluates a segmentation, given as a uniform scalar field, against a set of landmarks. For each landmark,
+a corresponding voxel is computed. It is either the nearest voxel or the nearest foreground voxel (using BFS).
+The label field is evaluated at this voxel position and a counter for the label found there is increased (label was hit
+by the landmark). This counter value and several
+derived measures are output as a spreadsheet with one line per label. For a perfect segmentation, each hit counter (except for the background label)
+equals 1, i.e. each label is hit by exactly one marker. Additionally, there is a second table in the spreadsheet with summarized information
+containing data like the number of correct labels, numer of clusters, ..., and finally the precision and recall value.
+\end{hxdescription}
+
+\begin{hxconnections}
+\hxlabel{HxMTLandmarkEvaluation_data}
+\hxport{Data}{\tt [required]}\\
+Label field
+
+\hxlabel{HxMTLandmarkEvaluation_landmarks}
+\hxport{Landmarks}{\tt [required]}\\
+Landmarks
+
+\end{hxconnections}
+
+\begin{hxports}
+\hxlabel{HxMTLandmarkEvaluation_neighborhood}
+\hxport{Neighborhood}\\
+\hximage{HxMTLandmarkEvaluation_neighborhood}\\
+Select whether you want to use the voxel that is the nearest to a given landmark ("Direct neighbors"),
+or if you want to exclude background voxels by searching for the nearest foreground
+voxel (using BFS).
+
+\end{hxports}
+
+\end{hxmodule2}

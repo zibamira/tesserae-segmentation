@@ -1,0 +1,69 @@
+\begin{hxmodule2}{AverageValueInNeighborhood}{Two ways to calculate average values}
+
+\hxlabel{HxAverageValueInNeighborhood}
+\hxfeatureid{HxAverageValueInNeighborhood}
+
+\begin{hxdescription}
+Given a scalar field and a label field there are 2 ways to compute average values:
+
+1. Compute the average value in a neighborhood for all voxels inside the given label field.
+The neighborhood contains all voxels that are in the label field and in a cube around the current voxel.
+The port size determines the size of this cube (sidelength / 2).
+The output is a scalar field.
+
+2. Compute average values in neighborhoods around the labels (one value per label).
+The result is written in a spreadheet.
+The neighborhood is computed via dilation (using ball, size is taken from size port and equals
+half-kernel size). The average is computed for all voxels inside the dilation and not inside the original label,
+additionaly only values larger than a given threshold are taken into calculation.
+\end{hxdescription}
+
+\begin{hxconnections}
+\hxlabel{HxAverageValueInNeighborhood_data}
+\hxport{Data}{\tt [required]}\\
+Scalar field
+
+\hxlabel{HxAverageValueInNeighborhood_labelField}
+\hxport{Label Field}{\tt [optional]}\\
+Label field
+
+\end{hxconnections}
+
+\begin{hxports}
+\hxlabel{HxAverageValueInNeighborhood_selection}
+\hxport{Selection}\\
+\hximage{HxAverageValueInNeighborhood_selection}\\
+Select between the 2 different algorithms.
+See desciption above.
+
+\hxlabel{HxAverageValueInNeighborhood_size}
+\hxport{Size}\\
+\hximage{HxAverageValueInNeighborhood_size}\\
+Size of cube for algorithm 1 (half of one side)
+and size of ball for algorithm 2 (half kernel size).
+See desciption above.
+
+\hxlabel{HxAverageValueInNeighborhood_threshold}
+\hxport{Threshold}\\
+\hximage{HxAverageValueInNeighborhood_threshold}\\
+Threshold for algorithm 2 to remove background.
+See desciption above.
+
+\hxlabel{HxAverageValueInNeighborhood_visualizeCoords}
+\hxport{Visualize Coords}\\
+\hximage{HxAverageValueInNeighborhood_visualizeCoords}\\
+Voxel coords for neighborhood visualization.
+See description of port "Visualize".
+
+\hxlabel{HxAverageValueInNeighborhood_visualize}
+\hxport{Visualize}\\
+\hximage{HxAverageValueInNeighborhood_visualize}\\
+Returns a label field with value 1 for all voxels inside
+the neighborhood (size controlled by "Size" port) around a given
+voxel. Used for the visualization of the neighborhood for
+a paper. Voxel coords are set in the "Visualize Coords" port.
+
+
+\end{hxports}
+
+\end{hxmodule2}

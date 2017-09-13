@@ -1,0 +1,29 @@
+\begin{hxmodule2}{CreateRegionAdjacencyGraph}{Creates region adjacency graph (RAG) from given label field.}
+
+\hxlabel{HxCreateRegionAdjacencyGraph}
+\hxfeatureid{HxCreateRegionAdjacencyGraph}
+
+\begin{hxdescription}
+Creates region adjacency graph (RAG) from given label field.
+The RAG contains one vertex for each label in the label field
+(just labels with corresponding number of voxels > 0)
+If two labels are neighbored, an edge is created.
+Kind of neighborhood can be chosen between 6, 18 or 26 connectivity.
+\end{hxdescription}
+
+\begin{hxconnections}
+\hxlabel{HxCreateRegionAdjacencyGraph_data}
+\hxport{Data}{\tt [required]}\\
+Label field
+
+\end{hxconnections}
+
+\begin{hxports}
+\hxlabel{HxCreateRegionAdjacencyGraph_neighborhood}
+\hxport{Neighborhood}\\
+\hximage{HxCreateRegionAdjacencyGraph_neighborhood}\\
+One voxel (assuming it is not an edge voxel) is connected to 6, 18 or 26 voxels.
+
+\end{hxports}
+
+\end{hxmodule2}

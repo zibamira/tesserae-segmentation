@@ -1,0 +1,9 @@
+set PACKAGE {hxcontourtree}
+
+set LIBS {mclib hxcore hxfield hxspatialgraph qt oiv hxplot}
+
+set SHARE {
+    share/resources/*.rc
+    share/script-objects/*.scro
+    
+}

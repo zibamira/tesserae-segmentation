@@ -1,0 +1,17 @@
+module -name "Landmark evaluation" \
+-primary "HxUniformScalarField3" \
+-category "Femi" \
+-class "HxMTLandmarkEvaluation" \
+-package "hxinteractivesegmentation"
+
+module -name "Landmark Evaluation Script" \
+           -package "hxscriptobj" \
+           -primary  "HxLandmarkSet" \
+           -category "Compute" \
+           -proc {
+               set mod [load $AMIRA_ROOT/share/script-objects/LandmarkEvaluation.scro]
+               if { [exists $PRIMARY] } {
+                   $mod data connect $PRIMARY
+                   $mod fire
+               }
+           }

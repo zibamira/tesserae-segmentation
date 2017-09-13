@@ -1,0 +1,39 @@
+\begin{hxmodule2}{SegmentationEvaluation}{Computes RAND and VI values for two segmentations.}
+
+\hxlabel{HxSegmentationEvaluation}
+\hxfeatureid{HxSegmentationEvaluation}
+
+\begin{hxdescription}
+This module computes the rand index and variation of information to compare a segmentation result
+with a ground truth segmentation (or an arbitrary second segmentation).
+Only voxels inside given mask are taken into calculation (mask value > 0).
+Labelfields are unsigned 16 bit label fields.
+Background voxels (value = 0) in the masked area are taken into calculation and treated as all other labels.
+It does not matter if there are labels with no voxels inside the masked region.
+\end{hxdescription}
+
+\begin{hxconnections}
+\hxlabel{HxSegmentationEvaluation_data}
+\hxport{Data}{\tt [required]}\\
+Label field of first segmentation. Must be unsigned 16 bit.
+
+\hxlabel{HxSegmentationEvaluation_groundTruthSegmentation}
+\hxport{Ground Truth Segmentation}{\tt [required]}\\
+Label field of second segmentation. Must be unsigned 16 bit.
+
+\hxlabel{HxSegmentationEvaluation_mask}
+\hxport{Mask}{\tt [required]}\\
+Scalar field or label field, only voxels inside the
+masked region are taken into calculation, that means, all voxels with mask-value larger 0.
+
+\end{hxconnections}
+
+\begin{hxports}
+\hxlabel{HxSegmentationEvaluation_userSelection}
+\hxport{User Selection}\\
+\hximage{HxSegmentationEvaluation_userSelection}\\
+Select which measure you want to compute.
+
+\end{hxports}
+
+\end{hxmodule2}

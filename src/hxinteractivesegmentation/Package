@@ -1,0 +1,7 @@
+set PACKAGE {hxinteractivesegmentation}
+set LIBS {hxcore mclib oiv amiramesh hxfield hxspreadsheet hxlattice hxlandmark hxcolor qt}
+
+set SHARE {
+    share/resources/*.rc
+    share/script-objects/*.scro
+}

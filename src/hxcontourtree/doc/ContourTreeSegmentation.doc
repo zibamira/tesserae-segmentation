@@ -1,0 +1,45 @@
+\begin{hxmodule2}{ContourTreeSegmentation.scro}{Apply HxContourTreeSegmentation for multiple persistence values automatically.}
+
+\hxlabel{ContourTreeSegmentation}
+
+\begin{hxdescription}
+Goal: Apply the \link{HxContourTreeSegmentation}{Contour Tree Segmentation module} for multiple persistence values automatically.
+Inputs: Scalar field that should be segmented and the HxContourTreeSegmentation module.
+The user selects the range of persistence values and the output folder where all
+segmentations are stored.
+The output segmentations are 32 bit label fields.
+
+\end{hxdescription}
+
+\begin{hxconnections}
+\hxlabel{ContourTreeSegmentation_data}
+\hxport{Data}{\tt [mandatory]}\\
+Scalar field that should be segmented.
+
+\hxlabel{ContourTreeSegmentation_CTS}
+\hxport{CTS}{\tt [mandatory]}\\
+HxContourTreeSegmentation module that will be applied.
+
+\end{hxconnections}
+
+\begin{hxports}
+\hxlabel{ContourTreeSegmentation_persistenceRange}
+\hxport{Persistence Range}\\
+\hximage{ContourTreeSegmentation_persistenceRange}\\
+The first entry contains the first and smallest persistence value.
+The third entry contains the stepsize that is added to the previous persistence value.
+This is done for all persistence values smaller than the value in the second entry.
+
+\hxlabel{ContourTreeSegmentation_outputDir}
+\hxport{Output Dir}\\
+\hximage{ContourTreeSegmentation_outputDir}\\
+The output folder where all segmentations are stored.
+
+\hxlabel{ContourTreeSegmentation_doit}
+\hxport{Do It}\\
+\hximage{ContourTreeSegmentation_doit}\\
+Start contour tree segmentations.
+
+\end{hxports}
+
+\end{hxmodule2}

@@ -1,0 +1,12 @@
+################################################################################
+#
+# Resource file of custom package hxspatialgraphtools
+#
+################################################################################
+
+module -name "CreateRegionAdjacencyGraph" \
+    -primary "HxUniformLabelField3" \
+    -class "HxCreateRegionAdjacencyGraph" \
+    -category "Compute" \
+    -package "hxspatialgraphtools" \
+    -icon "TVDefCompute"

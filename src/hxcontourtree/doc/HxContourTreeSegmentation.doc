@@ -1,0 +1,149 @@
+\begin{hxmodule2}{Contour Tree Segmentation}{Segment image data based on the idea of a contour tree}
+
+\hxlabel{HxContourTreeSegmentation}
+\hxpackname{amira}
+
+\begin{hxdescription}
+This module computes a segmentation of the image data based on the idea of the
+contour tree.  It traverses all voxels in the order of decreasing scalar values
+up to a given user-defined {\em threshold}.  If a new local maximum is found,
+this voxel gets a new label.  Each new voxel that is neighbored to an already
+labeled voxel gets the same label as its neighbor.  If a voxel is neighbored to
+two or more voxels with different labels, a merge in terms of a contour tree
+merge happens.  At this point, the two labeled regions will be merged if the
+difference between one of the maxima and the value at the current voxel is less
+then a user-defined {\em persistence value}.  Note that the objects to be
+segmented must have larger values than the background.  If this is not the case,
+use the \link{HxArithmetic}{Arithmetic} module to invert the image data.
+
+There is a faster, nearly similar version of this algorithm that can be activated
+with the \link{HxContourTreeSegmentation_fastSegmentation}{Fast watershed segmentation} port.
+Here, the algorithm becomes a hierarchical watershed segmentation (just from high values
+to low values) where the implementation is based on the contour tree.
+
+The output segmentations are 32 bit label fields.
+
+The whole workflow for object separation using this module is described in a 
+separate \link{tutContourTreeSegmentation}{tutorial}.
+\end{hxdescription}
+
+\begin{hxconnections}
+\hxlabel{HxContourTreeSegmentation_data}
+\hxport{Data}{\tt [required]}\\
+The image data to be segmented.
+
+\end{hxconnections}
+
+\begin{hxports}
+\hxlabel{HxContourTreeSegmentation_auto-initialization}
+\hxport{Auto-initialization}\\
+\hximage{HxContourTreeSegmentation_auto-initialization}\\
+Switches on or off the auto-initialization of the threshold and persistence
+values.  The values of the ports {\em Threshold} and {\em Persistence value} can
+be computed automatically.  For this purpose, the settings of the ports {\em
+Persistence mode} and {\em Persistence options} are used.
+
+\hxlabel{HxContourTreeSegmentation_threshold}
+\hxport{Threshold}\\
+\hximage{HxContourTreeSegmentation_threshold}\\
+The threshold up to which voxels are considered.
+
+\hxlabel{HxContourTreeSegmentation_persistenceMode}
+\hxport{Persistence mode}\\
+\hximage{HxContourTreeSegmentation_persistenceMode}\\
+This port allows switching between different modes to set and to compute the
+persistence criterion:
+
+\begin{itemize}
+
+\item {\bf absolute}: The persistence value is a absolute value of the range of
+scalar values in the field.
+
+\item {\bf relative}: The persistence value is normalized with respect to a
+range of scalar values, which can be chosen in port {\em Persistence options}.
+The relative persistence is in the range between 0 and 1.
+
+\item {\bf adaptive}: The persistence value is interpreted as the ratio between
+the persistence and the smaller maximum of the two current regions.  This
+criterion is locally computed for each merge pair during the propagation
+process.
+
+\end{itemize}
+
+\hxlabel{HxContourTreeSegmentation_persistenceOptions}
+\hxport{Persistence options}\\
+\hximage{HxContourTreeSegmentation_persistenceOptions}\\
+This port determines which range of scalar values is used to adjust or to
+normalize the persistence value in {\em absolute} or {\em relative} mode,
+repsectively.
+
+\begin{itemize}
+
+\item {\bf range}: This option applies the adjustment or the normalization to
+the entire intensity range of the input data.
+
+\item {\bf histogram}: This option computes the histogram of the scalar values
+in the data set and determines the range by omitting the smallest and largest 5
+percent of the data values.
+
+\end{itemize}
+
+\hxlabel{HxContourTreeSegmentation_persistenceValue}
+\hxport{Persistence value}\\
+\hximage{HxContourTreeSegmentation_persistenceValue}\\
+The {\em persistence value} allows the user to define the level at which regions
+are merged.  The larger this value, the more likely it is that regions will be
+merged.
+
+\hxlabel{HxContourTreeSegmentation_minimalSegmentSize}
+\hxport{Minimal segment size}\\
+\hximage{HxContourTreeSegmentation_minimalSegmentSize}\\
+Regions consisting of less voxels than the {\em minimal segment size value}
+are merged whenever possible.
+
+\hxlabel{HxContourTreeSegmentation_sortNeighborsBy}
+\hxport{Sort neighbors by}\\
+\hximage{HxContourTreeSegmentation_sortNeighborsBy}\\
+If a voxel is neighbored to regions with different labels, it is not
+clear to which of these regions the voxel will be assigned.  Two
+strategies are implemented in this module.  If {\em value} is
+selected, the voxel will be assigned to the region of the neighbor
+with the largest value.  Otherwise, a majority vote is carried out
+and the voxel is assigned to the region where most of its neighbors
+belong to.
+
+\hxlabel{HxContourTreeSegmentation_fastSegmentation}
+\hxport{Fast segmentation}\\
+\hximage{HxContourTreeSegmentation_fastSegmentation}\\
+If checked, the module applies a faster algorithm to compute the
+segmentation. The algorithm becomes a hierarchical watershed segmentation (just from high values
+to low values) where the implementation is based on the contour tree.
+The main idea is to compute the finest segmentation
+(minimal segment size 0 and persistence value 0) in a preprocessing step.
+In the following iteration through the data set, the algorithm merges
+these precomputed labels based on their size and based on the persistence
+value. The result is only exactly the same as in the default algorithm if
+the minimal segment size is 0 and neighbors are ordered due to majority vote.
+If the minimal segment size is 0 and neighbors are ordered due to value,
+then the results are very similar (most probably no differences or just a
+few changed voxels). If the minimal segment size is larger than 0, then the
+results differ a lot, the fast algorithm contains more labels because the
+precomputed segments are already larger when they are compared with the
+minimal segment size.
+
+For the first use or if there are changed parameters, an internal
+initialization is necessary. That initialization will need more time
+than a regular segmentation step but afterwards the fast segmentation
+is much faster.
+
+\hxlabel{HxContourTreeSegmentation_calculatePlot}
+\hxport{Plot}\\
+\hximage{HxContourTreeSegmentation_calculatePlot}\\
+Computes a plot showing the resulting number of labeled regions according to
+the persistence value. The maximum persistence value (on the x axis) is determined
+by the \link{HxContourTreeSegmentation_persistenceValue}{Persistence value} port.
+Minimal segment size and fast computation are taken into account.
+
+\end{hxports}
+
+\end{hxmodule2}

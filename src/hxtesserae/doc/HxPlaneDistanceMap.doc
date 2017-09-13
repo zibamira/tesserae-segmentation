@@ -1,0 +1,85 @@
+\begin{hxmodule2}{PlaneDistanceMap}{Computes a 2D planar distance map for a given foreground segmentation.}
+
+\hxlabel{HxPlaneDistanceMap}
+\hxpackname{amira}
+
+\begin{hxdescription}
+Computes a 2D planar distance map for a given foreground segmentation
+(foreground voxels with label field values > 0).
+
+For each foreground label: Compute the plane that approximates the surrounding label field
+in the best possible way. Then shoot rays inside this plane to compute the distance to the
+nearest background voxel.
+
+Plane approximation starting from point P: The standard-solution is to shoot rays in all 3D directions and to
+compute the intersection points of these rays with the background. The plane is then
+the best fitting plane regarding these points (in least squares sense; and translated to go
+through P). As a second option, it is possible to take all voxel positions
+of foreground voxels around P (in a neighborhood) and do a PCA on these positions. The first 2
+eigenvectors span the computed plane.
+
+Distance computation in plane: The distance can be computed one-directional, two-directional or
+in an average sense.
+
+This module was used for distance map computation for the tesserae segmentation project.
+\end{hxdescription}
+
+\begin{hxconnections}
+\hxlabel{HxPlaneDistanceMap_data}
+\hxport{Data}{\tt [required]}\\
+Label field: foreground segmentation
+
+\hxlabel{HxPlaneDistanceMap_sphere}
+\hxport{Sphere}{\tt [optional]}\\
+If the plane is approximated by shooting 3D rays, you have to attach a sphere mesh at
+this port to determine the number of rays. Use the HxCreateSphere module (only change
+"Number Of Points Per Unit^2" port) to create the sphere.
+
+\hxlabel{HxPlaneDistanceMap_planeNormals}
+\hxport{Plane Normals}{\tt [optional]}\\
+Only for experts: Attach a normal field if plane normals were already computed.
+
+\hxlabel{HxPlaneDistanceMap_visualizationlandmarks}
+\hxport{Visualization Landmarks}{\tt [optional]}\\
+Only for experts: Attach one landmark, and select "Landmark sphere visualization" at the "Type" port,
+then the module returns the 3D background intersection points as landmarks. There is no distance
+map computation.
+
+\hxlabel{HxPlaneDistanceMap_mask}
+\hxport{Mask}{\tt [optional]}\\
+Label field. If used the distance map values are ony computed where the mask values are larger 0.
+
+\end{hxconnections}
+
+\begin{hxports}
+\hxlabel{HxPlaneDistanceMap_type}
+\hxport{Type}\\
+\hximage{HxPlaneDistanceMap_type}\\
+For "Sphere" / "No Sphere" see the intro text above.
+For "Landmark sphere visualization" see the description of the "Visualization Landmarks" port.
+
+
+\hxlabel{HxPlaneDistanceMap_distance}
+\hxport{Distance}\\
+\hximage{HxPlaneDistanceMap_distance}\\
+For distance computation rays are shot inside the already computed plane and the nearest background
+intersection points are computed. "one-directional" means that the distance map value is the shortest
+distance to a background voxel going in one direction. "two-directions" means that each ray is
+followed forewards and backgwards, the distances to the nearest background intersection points are
+added. "average" means all one-directional distances are averaged.
+
+
+\hxlabel{HxPlaneDistanceMap_numberOfRays}
+\hxport{Number Of Rays}\\
+\hximage{HxPlaneDistanceMap_numberOfRays}\\
+Number of rays shot in the already computed plane (for distance computations).
+
+\hxlabel{HxPlaneDistanceMap_sizebox}
+\hxport{sizebox}\\
+\hximage{HxPlaneDistanceMap_sizebox}\\
+Only used if the "No sphere" option is used. The value determines the neighborhood size
+(length of neighborhood box sides is 2 times this value).
+
+\end{hxports}
+
+\end{hxmodule2}

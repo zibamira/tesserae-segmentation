@@ -1,0 +1,55 @@
+\begin{hxmodule2}{SegmentationEvaluationScript.scro}{Apply HxSegmentationEvaluation to 5 segmentations to compute RAND/VI values.}
+
+\hxlabel{SegmentationEvaluationScript}
+
+\begin{hxdescription}
+Goal: Apply the \link{HxSegmentationEvaluation}{Segmentation Evaluation module} to 5 segmentations (all segmentations are
+compared with all other segmentations).
+Writes all VI / RAND values to the console.
+Needs exactly 5 label fields / segmentations and one mask.
+Input label fields are internally converted to 16 Bit unsigned labels (required by
+HxSegmentationEvaluation).
+Background voxels (value = 0) in the masked area are taken into calculation and
+treated as all other labels. It does not matter if there are labels with no voxels
+inside the masked region.
+
+\end{hxdescription}
+
+\begin{hxconnections}
+\hxlabel{SegmentationEvaluationScript_data}
+\hxport{Data}{\tt [mandatory]}\\
+Label field 1
+
+\hxlabel{SegmentationEvaluationScript_labelField2}
+\hxport{Label Field 2}{\tt [mandatory]}\\
+Label field 2
+
+\hxlabel{SegmentationEvaluationScript_labelField3}
+\hxport{Label Field 3}{\tt [mandatory]}\\
+Label field 3
+
+\hxlabel{SegmentationEvaluationScript_labelField4}
+\hxport{Label Field 4}{\tt [mandatory]}\\
+Label field 4
+
+\hxlabel{SegmentationEvaluationScript_labelField5}
+\hxport{Label Field 5}{\tt [mandatory]}\\
+Label field 5
+
+\hxlabel{SegmentationEvaluationScript_mask}
+\hxport{Mask}{\tt [mandatory]}\\
+Scalar field or label field. Only voxels inside the masked region are taken into calculation,
+that means, all voxels with mask-value larger 0.
+
+
+\end{hxconnections}
+
+\begin{hxports}
+\hxlabel{SegmentationEvaluationScript_doit}
+\hxport{Do It}\\
+\hximage{SegmentationEvaluationScript_doit}\\
+Start VI / RAND computations.
+
+\end{hxports}
+
+\end{hxmodule2}

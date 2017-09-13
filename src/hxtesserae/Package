@@ -1,0 +1,14 @@
+set PACKAGE {hxtesserae}
+
+set LIBS {
+    hxplot hxtime hxsurface hxcolor hxfield hxlandmark
+    hxcore amiramesh mclib oiv tcl hxitk itk qt openmp hxspatialgraph hxsurftools hxlineviewer
+    hxcontourtree hxmatlab 
+    hxspreadsheet hxquant2 hxquant2custom hxvolumeviz hxvolumeviz2 hxarith hxspatialgraphtools
+}
+
+set SHARE {
+    share/resources/hxtesserae.rc
+    share/script-objects/SegmentationEvaluationScript.scro
+}
+

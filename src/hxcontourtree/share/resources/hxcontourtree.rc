@@ -1,0 +1,17 @@
+module -name "Contour Tree Segmentation" \
+    -primary "HxLattice3" \
+    -category "Segmentation" \
+    -class "HxContourTreeSegmentation"\
+    -package "hxcontourtree"
+
+module -name "Contour Tree Segmentation Script" \
+    -package "hxscriptobj" \
+    -primary "HxLattice3" \
+    -category "Segmentation" \
+    -proc {
+        set mod [load $AMIRA_ROOT/share/script-objects/ContourTreeSegmentation.scro]
+        if { [exists $PRIMARY] } {
+            $mod data connect $PRIMARY
+            $mod fire
+        }
+    }

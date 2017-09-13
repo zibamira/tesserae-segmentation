@@ -1,0 +1,185 @@
+\begin{hxmodule2}{CorrectAndAnalyzeLabelfield}{Allows error correction and analysis of label fields.}
+
+\hxlabel{HxCorrectAndAnalyzeLabelfield}
+\hxfeatureid{HxCorrectAndAnalyzeLabelfield}
+
+\begin{hxdescription}
+This module was developed for the postprocessing / error correction of segmentations - especially for tesserae
+(mineralized tiles on the endoskeleton of sharks and rays) - allowing
+operations like label merging or splitting. Additionally, there are operations to highlight
+unusual labels (for example regarding their size, these labels are then called "critical regions").
+Main idea of the module: use the region adjacency graph (RAG or graph) of the label field for user interaction
+and visualization. The RAG can be created by the module "HxCreateRegionAdjacencyGraph",
+must have a vertex attribute called "Label" containing the corresponding label
+in the label field and is attached to the data port. The label attribute is only used
+during the initialization step of this module. The label field can contain gaps, that means
+labels with 0 voxels.
+
+This module can also be used for arbitrary, non-tesserae label fields (and their RAGs).
+
+The module has an initialization step (by pressing apply). For interaction with this module you have
+to use the visualization modules directly created in this initialization. Visualization
+is done with a "Voxelized Renderer" or optional with a "Surface View" of a surface.
+It is suggested to open the "LineRayCast" in one viewer and the "Voxelized Renderer" in a second
+one.
+
+It is not supported to save a project file and load it again. You have to use this module manually.
+\end{hxdescription}
+
+\begin{hxconnections}
+\hxlabel{HxCorrectAndAnalyzeLabelfield_data}
+\hxport{Data}{\tt [required]}\\
+Region adjacency graph (RAG or graph) used for user interaction
+and visualization. The RAG can be created by the module "HxCreateRegionAdjacencyGraph" and
+must have a vertex attribute called "Label" containing the corresponding label
+in the label field.
+
+The graph is used for user interaction. In order to select multiple vertices in a LineRayCast
+of a graph press CTRL while clicking at the vertex (starting from the second vertex).
+
+\hxlabel{HxCorrectAndAnalyzeLabelfield_labelfield}
+\hxport{Label Field}{\tt [required]}\\
+Label field that should be improved / analyzed.
+
+\hxlabel{HxCorrectAndAnalyzeLabelfield_intensityField}
+\hxport{Intensity Field}{\tt [optional]}\\
+Used for thresholding of selected labels.
+The field is usually the original gray-scale dataset that was used to generate
+the label field (in case of tesserae: the CT).
+
+\hxlabel{HxCorrectAndAnalyzeLabelfield_distancemap}
+\hxport{Distance Map}{\tt [optional]}\\
+Used for all splits:
+\begin{enumerate}
+\item Contour tree based split: Use distance map computed on foreground voxels.
+\item Spectral clustering: Only important to have values larger 0 for non-background label voxels.
+      So it is possible to use the label field itself or to simply use the distance map.
+\end{enumerate}
+
+\hxlabel{HxCorrectAndAnalyzeLabelfield_referenceLabelField}
+\hxport{Reference Label Field}{\tt [optional]}\\
+Reference field for "Remove regions using reference field".
+
+\end{hxconnections}
+
+\begin{hxports}
+\hxlabel{HxCorrectAndAnalyzeLabelfield_meld}
+\hxport{Meld}\\
+\hximage{HxCorrectAndAnalyzeLabelfield_meld}\\
+Merges all critical regions / labels into the largest (most number of voxels) neighbor or
+merges all selected (in the Lineraycast of the RAG) labels.
+
+\hxlabel{HxCorrectAndAnalyzeLabelfield_split}
+\hxport{Split}\\
+\hximage{HxCorrectAndAnalyzeLabelfield_split}\\
+Select ONE RAG node. The split operation creates multiple labels for this one label. It is assumed
+that the labels are directly connected but that there is some kind of thinner connection between the labels.
+This is where the split should happen. It is achieved by working with a distance map or by treating the
+voxels as a graph:
+\begin{enumerate}
+\item Two regions contour tree: Split one label in exactly 2 parts according to the contour tree of the
+distance map (tree only created for voxels in the split-label). The distance map must be attached to
+its port.
+\item Spectral clustering: Write the wished number of labels (so 2 if you want to split the label in 2 parts)
+in the first entry of "Int Paramaters". The spectral clustering algorithm treats the segmentation as a graph
+(one vertex per voxel) and is performed using Matlab. Additionally, the distance map must be attached to its
+port. To use this split, Amira must be able to connect to your Matlab installation,
+and Matlab must include the Statistics Toolbox.
+\item Standard contour tree: Split one label in multiple parts according to the contour tree of the
+distance map (tree only created for voxels in the split-label). The persistence value is the first
+entry of the "Float Parameters", minimum segment size is 0.0000001 (see "HxContourTreeSegmentation" for more
+information). The distance map must be attached to its port.
+\end{enumerate}
+
+\hxlabel{HxCorrectAndAnalyzeLabelfield_remove}
+\hxport{Remove}\\
+\hximage{HxCorrectAndAnalyzeLabelfield_remove}\\
+Removes all critical labels / regions or removes selected labels.
+
+\hxlabel{HxCorrectAndAnalyzeLabelfield_visualization}
+\hxport{Show}\\
+\hximage{HxCorrectAndAnalyzeLabelfield_visualization}\\
+Shows either the whole label field or only the critical regions or only the selected regions
+in the Voxelized Renderer and additionally in the surface (only if surface is existing and up to date).
+
+\hxlabel{HxCorrectAndAnalyzeLabelfield_surface}
+\hxport{Surface}\\
+\hximage{HxCorrectAndAnalyzeLabelfield_surface}\\
+Allows the creation and updating of a surface of the label field for additional visualization (next
+to the "Voxelized Renderer"). If "Auto update" is selected, the surface is automatically recomputed whenever
+the label field is changed.
+
+\hxlabel{HxCorrectAndAnalyzeLabelfield_misc}
+\hxport{Misc}\\
+\hximage{HxCorrectAndAnalyzeLabelfield_misc}\\
+"Improve colors" changes the material colors of the labelfield such that neighbored (regarding edges in RAG)
+labels have different colors.
+
+"Print vertices" prints the ID of the selected RAG vertices.
+
+"Thresholding" uses
+a scalar field attached to the "Intensity Field" port to do a thresholding of selected labels (selection via RAG),
+the threshold is the first entry of the "Float Parameters" port. Keep in mind to update the distance map
+afterwards (thresholding changes the label field so also a distance map update is necessary).
+
+"Get clean graph" duplicates the graph and updates all "Label" attribue values on it such that
+the graph corresponds to the input label field where all labels with 0 voxels were removed.
+You can use "Convert Image Type" on the input label field and "Get clean graph" on the graph
+to create a cleaned graph / label field pair.
+
+"Remove regions using reference field" removes all labels where all voxels have value 0
+in the input reference label field.
+
+\hxlabel{HxCorrectAndAnalyzeLabelfield_editbuffer}
+\hxport{Critical regions}\\
+\hximage{HxCorrectAndAnalyzeLabelfield_editbuffer}\\
+These buttons control the critical regions buffer. "Add" and "Remove" use the critical regions selected in the 
+dropdown list in "Critical Region Selection" and add them to / remove them from the buffer. "Add selected" /
+"Remove selected" do the same with manually selected (via RAG) labels. The number of labels in the critical
+regions buffer can be seen above all other ports; critical regions can be visualized via "Show".
+"Clear" removes all labels from the buffer.
+
+\hxlabel{HxCorrectAndAnalyzeLabelfield_criticalRegionSelection}
+\hxport{Critical Region Selection}\\
+\hximage{HxCorrectAndAnalyzeLabelfield_criticalRegionSelection}\\
+Select the type of critical region you are interested in (select it here and press "Add" at the "Critical regions"
+port to add it to the critical regions buffer):
+\begin{enumerate}
+\item Small regions: Labels with less voxels than the value in the first "Int Parameters" entry.
+\item Near regions: Labels where the corresponding RAG vertices are nearer in 3D space than
+the value in the first "Float Parameters" entry.
+\item Inner regions: Labels with no connection to the background (0 labels).
+\item Number of neighbours: Labels with less neighbors (regarding edges in RAG) than
+the value in the first "Int Parameters" entry and more neighbors than
+the value in the second "Int Parameters" entry.
+\item Size of connected components: Labels where the corresponding vertex in the RAG is in a
+connected component with less vertices than the value in the first "Int Parameters" entry.
+\item Just connected to exterior: Labels only connected to the background (0 labels).
+\end{enumerate}
+
+\hxlabel{HxCorrectAndAnalyzeLabelfield_surfaceField}
+\hxport{Surface Field}\\
+\hximage{HxCorrectAndAnalyzeLabelfield_surfaceField}\\
+All vertex attributes of the RAG are stored in the dropdown list. Select one and press "Create"
+to create a Surface Field where all triangles belonging to a certain label have the value of
+this attribute (for this label / vertex).
+
+\hxlabel{HxCorrectAndAnalyzeLabelfield_intParameters}
+\hxport{Int Parameters}\\
+\hximage{HxCorrectAndAnalyzeLabelfield_intParameters}\\
+Integer paramters for multiple ports. The other ports contain a description of the needed values.
+
+\hxlabel{HxCorrectAndAnalyzeLabelfield_floatParameters}
+\hxport{Float Parameters}\\
+\hximage{HxCorrectAndAnalyzeLabelfield_floatParameters}\\
+Float paramters for multiple ports. The other ports contain a description of the needed values.
+
+\hxlabel{HxCorrectAndAnalyzeLabelfield_doIt}
+\hxport{Action}\\
+\hximage{HxCorrectAndAnalyzeLabelfield_doIt}\\
+Starts the initialization of the module. Needs the label field and the RAG; creates visualization
+modules for user interaction.
+
+\end{hxports}
+
+\end{hxmodule2}

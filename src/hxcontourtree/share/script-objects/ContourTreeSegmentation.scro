@@ -1,0 +1,106 @@
+# Amira-Script-Object V3.0
+
+# Goal: Apply HxContourTreeSegmentation for multiple persistence values automatically.
+# Inputs: Scalar field that should be segmented and the HxContourTreeSegmentation module.
+# The user selects the range of persistence values and the output folder where all
+# segmentations are stored.
+
+$this proc constructor {} {
+
+    $this newPortConnection CTS HxContourTreeSegmentation
+    $this CTS setLabel "CTS"
+
+    $this newPortFloatTextN persistenceRange 3
+    $this persistenceRange setLabel "Persistence Range"
+
+    $this newPortDirectory outputDir
+    $this outputDir setLabel "Output Directory"
+
+    $this newPortDoIt doit
+
+    $this setVar scalarField ""
+    $this setVar cts         ""
+}
+
+$this proc destructor {} {
+}
+
+$this proc compute {} {
+
+    if { [ $this getVar scalarField ] == "" } {
+        echo "No data connected."
+        return
+    }
+
+    if { [ $this getVar cts ] == "" } {
+        echo "No CTS module connected."
+        return
+    }
+
+    if { [ $this doit wasHit ] } {
+        $this computeSegmentations
+    }
+}
+
+$this proc update {} {
+
+    if { [ $this data isNew ] } {
+        $this setVar scalarField [ $this data source ]
+    }
+
+    if { [ $this data isNew ] || [ $this CTS isNew ] } {
+        $this init
+    }
+}
+
+$this proc init {} {
+
+    if { [ $this getVar scalarField ] == "" } {
+        echo "No data connected."
+        return
+    }
+
+    $this setVar cts [ $this CTS source ]
+
+    if { [ $this getVar cts ] == "" } {
+        echo "No CTS module connected."
+        return
+    }
+
+    set persMinValue [ [ $this getVar cts ] persistenceValue getMinValue ]
+    set persMaxValue [ [ $this getVar cts ] persistenceValue getMaxValue ]
+    $this persistenceRange setMinMax 0 $persMinValue $persMaxValue
+    $this persistenceRange setMinMax 1 $persMinValue $persMaxValue
+    $this persistenceRange setMinMax 2 $persMinValue $persMaxValue
+}
+
+$this proc computeSegmentations {} {
+
+    set outputDir [$this outputDir getValue]
+    if { ${outputDir} == "" } {
+        echo "Please select an output directory!"
+        return
+    }
+
+    if { [ $this getVar cts ] == "" } {
+        echo "No CTS module connected."
+        return
+    }
+
+    set from [ $this persistenceRange getValue 0 ]
+    set to   [ $this persistenceRange getValue 1 ]
+    set step [ $this persistenceRange getValue 2 ]
+
+    if { $step <= 0 } {
+        return
+    }
+
+    for { set pers $from } { $pers <= $to } { incr pers $step } {
+        [ $this getVar cts ] persistenceValue setValue $pers
+        [ $this getVar cts ] doIt hit
+        [ $this getVar cts ] fire
+        set result [ [ $this getVar cts ] getResult 0 ]
+        set result [ $result composeLabel [ $result getLabel ] segmentation_pers-$pers ]
+        $result save AM $outputDir/$result.am
+    }
+}

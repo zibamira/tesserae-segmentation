@@ -1,0 +1,10 @@
+set PACKAGE {hxspatialgraphtools}
+
+set LIBS {
+    hxcore amiramesh mclib oiv tcl qt hxspatialgraph hxlineviewer hxlandmark hxfield openmp
+}
+
+set SHARE {
+    share/resources/hxspatialgraphtools.rc
+}
+

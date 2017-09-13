@@ -1,0 +1,45 @@
+################################################################################
+#
+# Resource file of custom package hxtesserae
+#
+################################################################################
+
+module -name     "CorrectAndAnalyzeLabelfield" \
+       -primary  "HxSpatialGraph" \
+       -class    "HxCorrectAndAnalyzeLabelfield" \
+       -category "Compute" \
+       -package  "hxtesserae" \
+       -icon     "TVDefCompute"
+
+module -name "PlaneDistanceMap" \
+    -primary "HxUniformScalarField3" \
+    -class "HxPlaneDistanceMap" \
+    -category "Tesserae" \
+    -package "hxtesserae" \
+    -icon "TVDefCompute"
+
+module -name "AverageValueInNeighborhood" \
+    -primary "HxUniformScalarField3" \
+    -class "HxAverageValueInNeighborhood" \
+    -category "Tesserae" \
+    -package "hxtesserae" \
+    -icon "TVDefCompute"
+
+module -name "SegmentationEvaluation" \
+    -primary "HxUniformScalarField3" \
+    -class "HxSegmentationEvaluation" \
+    -category "Tesserae" \
+    -package "hxtesserae" \
+    -icon "TVDefCompute"
+
+module -name "SegmentationEvaluationScript" \
+           -package "hxscriptobj" \
+           -primary  "HxUniformScalarField3" \
+           -category "Tesserae" \
+           -proc {
+               set mod [load $AMIRA_ROOT/share/script-objects/SegmentationEvaluationScript.scro]
+               if { [exists $PRIMARY] } {
+                   $mod data connect $PRIMARY
+                   $mod fire
+               }
+           }

@@ -1,0 +1,48 @@
+\begin{hxmodule2}{LandmarkEvaluation.scro}{Apply HxMTLandmarkEvaluation to multiple input segmentations.}
+
+\hxlabel{LandmarkEvaluation}
+
+\begin{hxdescription}
+Goal: Apply the \link{HxMTLandmarkEvaluation}{Landmark Evaluation module} to multiple input segmentations.
+One landmark set is given as input, the segmentations have to be in
+one folder (folder is given by user).
+Segmentations are not allowed to contain gaps (labels with no voxels).
+The results are written into a given output directory.
+There is a csv file containing the results for each input segmentation,
+additionally there is one file called "precisionRecallValues.csv" containing
+precision and recall values for all input segmentations.
+
+\end{hxdescription}
+
+\begin{hxconnections}
+\hxlabel{LandmarkEvaluation_data}
+\hxport{Data}{\tt [mandatory]}\\
+Landmark set.
+
+\end{hxconnections}
+
+\begin{hxports}
+\hxlabel{LandmarkEvaluation_sourceDirectory}
+\hxport{Source Directory}\\
+\hximage{LandmarkEvaluation_sourceDir}\\
+Directory containing all input segmentations.
+
+\hxlabel{LandmarkEvaluation_targetDirectory}
+\hxport{Target Directory}\\
+\hximage{LandmarkEvaluation_targetDir}\\
+Directory where all results are stored.
+
+\hxlabel{LandmarkEvaluation_neighborhood}
+\hxport{Neighborhood}\\
+\hximage{LandmarkEvaluation_neighborhood}\\
+Select whether you want to use the voxel that is the nearest to a given landmark ("Direct neighbors"),
+or if you want to exclude background voxels by searching for the nearest foreground voxel (using BFS).
+
+\hxlabel{LandmarkEvaluation_doit}
+\hxport{Do It}\\
+\hximage{LandmarkEvaluation_doit}\\
+Start landmark evaluations.
+
+\end{hxports}
+
+\end{hxmodule2}

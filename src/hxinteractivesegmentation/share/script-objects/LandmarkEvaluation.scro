@@ -1,0 +1,106 @@
+## Amira-Script-Object V3.0
+
+# Goal: Apply HxMTLandmarkEvaluation to multiple input segmentations.
+# One landmark set is given as input, the segmentations have to be in
+# one folder (folder is given by user).
+# Segmentations are not allowed to contain gaps (labels with no voxels).
+# The results are written into a given output directory.
+# There is a csv file containing the results for each input segmentation,
+# additionally there is one file called "precisionRecallValues.csv" containing
+# precision and recall values for all input segmentations.
+
+$this proc constructor {} {
+    $this data setLabel "Landmarks"
+
+    $this newPortDirectory sourceDir
+    $this sourceDir setLabel "Source Directory"
+
+    $this newPortDirectory targetDir
+    $this targetDir setLabel "Target Directory"
+
+    $this newPortRadioBox neighborhood 2
+    $this neighborhood setLabel "Neighborhood"
+    $this neighborhood setLabel 0 "Direct neighbors"
+    $this neighborhood setLabel 1 "BFS"
+    $this neighborhood setValue 1
+
+    $this newPortDoIt doit
+    $this doit setCmd 0 {$this start}
+}
+
+$this proc destructor {} {
+}
+
+$this proc update {} {
+}
+
+$this proc compute {} {
+}
+
+$this proc start {} {
+    set landmarks [$this data source]
+
+    if { ${landmarks} == "" } {
+        echo "Please connect the Landmarks port!"
+        return
+    }
+
+    set mtLandmarkEvaluation [ create HxMTLandmarkEvaluation ]
+    $mtLandmarkEvaluation landmarks connect $landmarks
+    $mtLandmarkEvaluation neighborhood setValue [$this neighborhood getValue]
+    $mtLandmarkEvaluation fire
+
+    set sourceDir [$this sourceDir getValue]
+    if { ${sourceDir} == "" } {
+        echo "Please select a source directory!"
+        return
+    }
+
+    set targetDir [$this targetDir getValue]
+    if { ${targetDir} == "" } {
+        echo "Please select a target directory!"
+        return
+    }
+
+    set allPrecisionRecallValuesSpreadsheet [ create HxSpreadSheet ]
+    set allPrecisionRecallValuesSpreadsheet [$allPrecisionRecallValuesSpreadsheet setLabel "precisionRecallValues"]
+    $allPrecisionRecallValuesSpreadsheet addColumn 0 Name string
+    $allPrecisionRecallValuesSpreadsheet addColumn 0 Precision float
+    $allPrecisionRecallValuesSpreadsheet addColumn 0 Recall float
+
+    set i 0
+
+    set segm ""
+
+    set files [ lsort [glob -type f ${sourceDir}/*] ]
+    foreach file $files {
+        set oldSegm ${segm}
+        set oldResult [$mtLandmarkEvaluation getResult 0]
+        set segm [ load "$file" ]
+        echo Processing $file
+        $mtLandmarkEvaluation data connect $segm
+        $mtLandmarkEvaluation fire
+        $mtLandmarkEvaluation doIt setValue 0
+        $mtLandmarkEvaluation fire
+
+        remove ${oldSegm}
+        remove ${oldResult}
+
+        set spreadsheet [$mtLandmarkEvaluation getResult 0]
+        set tableNum [$spreadsheet getTableNum Summary]
+        set precisionColumn 7
+        set recallColumn 8
+        set precisionValue [$spreadsheet getValue $tableNum $precisionColumn 0]
+        set recallValue [$spreadsheet getValue $tableNum $recallColumn 0]
+        $allPrecisionRecallValuesSpreadsheet setValue 0 0 $i $spreadsheet
+        $allPrecisionRecallValuesSpreadsheet setValue 0 1 $i $precisionValue
+        $allPrecisionRecallValuesSpreadsheet setValue 0 2 $i $recallValue
+
+        $spreadsheet exportData CSV ${targetDir}/${spreadsheet}.csv
+
+        set i [expr {$i+1}]
+    }
+
+    $allPrecisionRecallValuesSpreadsheet exportData "Microsoft XML Spreadsheet 2003" ${targetDir}/precisionRecallValues.xml
+    $allPrecisionRecallValuesSpreadsheet exportData CSV ${targetDir}/precisionRecallValues.csv
+}
