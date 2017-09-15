@@ -42,7 +42,7 @@ SimplicialMesh3DForHexahedralMesh::SimplicialMesh3DForHexahedralMesh(
 
     m_numNodes = 0;
 
-    m_neighborhood = SimplicialMesh3DForHexahedralMesh::NEIGHBORHOOD_6;
+    m_neighborhood = SimplicialMesh3DForHexahedralMesh::NEIGHBORHOOD_SIMPLICIALMESH;
 }
 
 SimplicialMesh3DForHexahedralMesh::~SimplicialMesh3DForHexahedralMesh()
@@ -194,18 +194,9 @@ SimplicialMesh3DForHexahedralMesh::getNodeIdx(
 }
 
 void
-SimplicialMesh3DForHexahedralMesh::get26NeighborHoodOfMeshVertex(
+SimplicialMesh3DForHexahedralMesh::get26NeighborHoodOfMeshVertexIgnoringThreshold(
     const mculong vertexIdx,
     McDArray<mculong>& neighbors)
-{
-    getAllNeighborsOfMeshVertex(vertexIdx, neighbors, NEIGHBORHOOD_26);
-}
-
-void
-SimplicialMesh3DForHexahedralMesh::getAllNeighborsOfMeshVertex(
-    const mculong vertexIdx,
-    McDArray<mculong>& neighbors,
-    const int typeOfNeighborHood)
 {
     McVec3i gridPos;
     getGridPosFromIdx(vertexIdx, gridPos);
@@ -220,53 +211,29 @@ SimplicialMesh3DForHexahedralMesh::getAllNeighborsOfMeshVertex(
     addNeighbor(gridPos, McVec3i( 0,  0,  1), neighbors);
     addNeighbor(gridPos, McVec3i( 0,  0, -1), neighbors);
 
-    if ( typeOfNeighborHood == NEIGHBORHOOD_SIMPLICIALMESH )
-    {
-        // Add diagonal neighbors on faces for simplicial mesh
-        addNeighbor(gridPos, McVec3i( 1,  1,  0), neighbors);
-        addNeighbor(gridPos, McVec3i(-1, -1,  0), neighbors);
-        addNeighbor(gridPos, McVec3i( 0,  1,  1), neighbors);
-        addNeighbor(gridPos, McVec3i( 0, -1, -1), neighbors);
-        addNeighbor(gridPos, McVec3i( 1,  0,  1), neighbors);
-        addNeighbor(gridPos, McVec3i(-1,  0, -1), neighbors);
-
-        // Add main diagonal neighbors for simplicial mesh
-        addNeighbor(gridPos, McVec3i( 1,  1,  1), neighbors);
-        addNeighbor(gridPos, McVec3i(-1, -1, -1), neighbors);
-
-        return;
-    }
-
     // Add 12 ring neighbors
-    if (    typeOfNeighborHood == NEIGHBORHOOD_18
-         || typeOfNeighborHood == NEIGHBORHOOD_26 )
-    {
-        addNeighbor(gridPos, McVec3i( 1,  1,  0), neighbors);
-        addNeighbor(gridPos, McVec3i(-1, -1,  0), neighbors);
-        addNeighbor(gridPos, McVec3i(-1,  1,  0), neighbors);
-        addNeighbor(gridPos, McVec3i( 1, -1,  0), neighbors);
-        addNeighbor(gridPos, McVec3i( 0,  1,  1), neighbors);
-        addNeighbor(gridPos, McVec3i( 0, -1, -1), neighbors);
-        addNeighbor(gridPos, McVec3i( 0, -1,  1), neighbors);
-        addNeighbor(gridPos, McVec3i( 0,  1, -1), neighbors);
-        addNeighbor(gridPos, McVec3i( 1,  0,  1), neighbors);
-        addNeighbor(gridPos, McVec3i(-1,  0, -1), neighbors);
-        addNeighbor(gridPos, McVec3i(-1,  0,  1), neighbors);
-        addNeighbor(gridPos, McVec3i( 1,  0, -1), neighbors);
-    }
+    addNeighbor(gridPos, McVec3i( 1,  1,  0), neighbors);
+    addNeighbor(gridPos, McVec3i(-1, -1,  0), neighbors);
+    addNeighbor(gridPos, McVec3i(-1,  1,  0), neighbors);
+    addNeighbor(gridPos, McVec3i( 1, -1,  0), neighbors);
+    addNeighbor(gridPos, McVec3i( 0,  1,  1), neighbors);
+    addNeighbor(gridPos, McVec3i( 0, -1, -1), neighbors);
+    addNeighbor(gridPos, McVec3i( 0, -1,  1), neighbors);
+    addNeighbor(gridPos, McVec3i( 0,  1, -1), neighbors);
+    addNeighbor(gridPos, McVec3i( 1,  0,  1), neighbors);
+    addNeighbor(gridPos, McVec3i(-1,  0, -1), neighbors);
+    addNeighbor(gridPos, McVec3i(-1,  0,  1), neighbors);
+    addNeighbor(gridPos, McVec3i( 1,  0, -1), neighbors);
 
-    if ( typeOfNeighborHood == NEIGHBORHOOD_26 )
-    {
-        // Add 8 main diagonal neighbors
-        addNeighbor(gridPos, McVec3i( 1,  1,  1), neighbors);
-        addNeighbor(gridPos, McVec3i( 1,  1, -1), neighbors);
-        addNeighbor(gridPos, McVec3i( 1, -1,  1), neighbors);
-        addNeighbor(gridPos, McVec3i(-1,  1,  1), neighbors);
-        addNeighbor(gridPos, McVec3i( 1, -1, -1), neighbors);
-        addNeighbor(gridPos, McVec3i(-1,  1, -1), neighbors);
-        addNeighbor(gridPos, McVec3i(-1, -1,  1), neighbors);
-        addNeighbor(gridPos, McVec3i(-1, -1, -1), neighbors);
-    }
+    // Add 8 main diagonal neighbors
+    addNeighbor(gridPos, McVec3i( 1,  1,  1), neighbors);
+    addNeighbor(gridPos, McVec3i( 1,  1, -1), neighbors);
+    addNeighbor(gridPos, McVec3i( 1, -1,  1), neighbors);
+    addNeighbor(gridPos, McVec3i(-1,  1,  1), neighbors);
+    addNeighbor(gridPos, McVec3i( 1, -1, -1), neighbors);
+    addNeighbor(gridPos, McVec3i(-1,  1, -1), neighbors);
+    addNeighbor(gridPos, McVec3i(-1, -1,  1), neighbors);
+    addNeighbor(gridPos, McVec3i(-1, -1, -1), neighbors);
 
     // clang-format on
 }
@@ -297,7 +264,7 @@ SimplicialMesh3DForHexahedralMesh::getNeighborsOfNode(
 {
     const mculong vertexIdx = getMeshVertexIdx(nodeIdx);
 
-    getNeighborsOfMeshVertex(neighborsWithSmallerValue, vertexIdx, neighbors, values, getNeighborhood());
+    getNeighborsOfMeshVertex(neighborsWithSmallerValue, vertexIdx, neighbors, values);
 }
 
 void
@@ -305,9 +272,10 @@ SimplicialMesh3DForHexahedralMesh::getNeighborsOfMeshVertex(
     const bool neighborsWithSmallerValue,
     const mculong vertexIdx,
     McDArray<mculong>& neighbors,
-    McDArray<float>& values,
-    const int typeOfNeighborHood) const
+    McDArray<float>& values) const
 {
+    const int typeOfNeighborHood = getNeighborhood();
+
     McVec3i gridPos;
     getGridPosFromIdx(vertexIdx, gridPos);
 
@@ -329,7 +297,8 @@ SimplicialMesh3DForHexahedralMesh::getNeighborsOfMeshVertex(
     addNeighbor(neighborsWithSmallerValue, vertex, gridPos, McVec3i( 0,  0,  1), neighbors, values);
     addNeighbor(neighborsWithSmallerValue, vertex, gridPos, McVec3i( 0,  0, -1), neighbors, values);
 
-    if ( typeOfNeighborHood == NEIGHBORHOOD_SIMPLICIALMESH )
+    if (    typeOfNeighborHood == NEIGHBORHOOD_SIMPLICIALMESH
+         || typeOfNeighborHood == NEIGHBORHOOD_26 )
     {
         // Add diagonal neighbors on faces for simplicial mesh
         addNeighbor(neighborsWithSmallerValue, vertex, gridPos, McVec3i( 1,  1,  0), neighbors, values);
@@ -342,39 +311,25 @@ SimplicialMesh3DForHexahedralMesh::getNeighborsOfMeshVertex(
         // Add main diagonal neighbors for simplicial mesh
         addNeighbor(neighborsWithSmallerValue, vertex, gridPos, McVec3i( 1,  1,  1), neighbors, values);
         addNeighbor(neighborsWithSmallerValue, vertex, gridPos, McVec3i(-1, -1, -1), neighbors, values);
-
-        return;
     }
 
-    // Add 12 ring neighbors
-    if (    typeOfNeighborHood == NEIGHBORHOOD_18
-         || typeOfNeighborHood == NEIGHBORHOOD_26 )
+    if ( typeOfNeighborHood == NEIGHBORHOOD_26 )
     {
-        addNeighbor(neighborsWithSmallerValue, vertex, gridPos, McVec3i( 1,  1,  0), neighbors, values);
-        addNeighbor(neighborsWithSmallerValue, vertex, gridPos, McVec3i(-1, -1,  0), neighbors, values);
-        addNeighbor(neighborsWithSmallerValue, vertex, gridPos, McVec3i( 0,  1,  1), neighbors, values);
-        addNeighbor(neighborsWithSmallerValue, vertex, gridPos, McVec3i( 0, -1, -1), neighbors, values);
-        addNeighbor(neighborsWithSmallerValue, vertex, gridPos, McVec3i( 1,  0,  1), neighbors, values);
-        addNeighbor(neighborsWithSmallerValue, vertex, gridPos, McVec3i(-1,  0, -1), neighbors, values);
+        // Add remaining edge connected neighbors
         addNeighbor(neighborsWithSmallerValue, vertex, gridPos, McVec3i( 1, -1,  0), neighbors, values);
         addNeighbor(neighborsWithSmallerValue, vertex, gridPos, McVec3i(-1,  1,  0), neighbors, values);
         addNeighbor(neighborsWithSmallerValue, vertex, gridPos, McVec3i( 0,  1, -1), neighbors, values);
         addNeighbor(neighborsWithSmallerValue, vertex, gridPos, McVec3i( 0, -1,  1), neighbors, values);
         addNeighbor(neighborsWithSmallerValue, vertex, gridPos, McVec3i( 1,  0, -1), neighbors, values);
         addNeighbor(neighborsWithSmallerValue, vertex, gridPos, McVec3i(-1,  0,  1), neighbors, values);
-    }
 
-    if ( typeOfNeighborHood == NEIGHBORHOOD_26 )
-    {
-        // Add 8 main diagonal neighbors
-        addNeighbor(neighborsWithSmallerValue, vertex, gridPos, McVec3i( 1,  1,  1), neighbors, values);
+        // Add remaining vertex connected neighbors
         addNeighbor(neighborsWithSmallerValue, vertex, gridPos, McVec3i( 1,  1, -1), neighbors, values);
         addNeighbor(neighborsWithSmallerValue, vertex, gridPos, McVec3i( 1, -1,  1), neighbors, values);
         addNeighbor(neighborsWithSmallerValue, vertex, gridPos, McVec3i(-1,  1,  1), neighbors, values);
         addNeighbor(neighborsWithSmallerValue, vertex, gridPos, McVec3i( 1, -1, -1), neighbors, values);
         addNeighbor(neighborsWithSmallerValue, vertex, gridPos, McVec3i(-1,  1, -1), neighbors, values);
         addNeighbor(neighborsWithSmallerValue, vertex, gridPos, McVec3i(-1, -1,  1), neighbors, values);
-        addNeighbor(neighborsWithSmallerValue, vertex, gridPos, McVec3i(-1, -1, -1), neighbors, values);
     }
 
     // clang-format on

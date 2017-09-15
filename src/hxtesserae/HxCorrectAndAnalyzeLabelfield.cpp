@@ -766,6 +766,8 @@ HxCorrectAndAnalyzeLabelfield::touchInputLabelField()
 void
 HxCorrectAndAnalyzeLabelfield::recomputeColormap()
 {
+    touchInputLabelField();
+
     m_labelField->fire();
     m_labelField->labelLattice().createMissingMaterials(m_labelField->labelLattice().materials(), HxLabelLattice3::RANDOM_COLORS);
     m_labelField->fire();
@@ -904,6 +906,7 @@ HxCorrectAndAnalyzeLabelfield::removeSelectedRegions()
     McDArray<int> selectedVertices = m_lineRayCast->getSelectedVertices();
     if (selectedVertices.sizeInt() == 0)
     {
+        theMsg->printf("Select at least one graph vertex");
         return;
     }
 
@@ -956,6 +959,7 @@ HxCorrectAndAnalyzeLabelfield::meldSelectedRegionsToOneRegion()
     McDArray<int> selectedVertices = m_lineRayCast->getSelectedVertices();
     if (selectedVertices.sizeInt() < 2)
     {
+        theMsg->printf("Select at least two graph vertices");
         return;
     }
 
@@ -1438,6 +1442,7 @@ HxCorrectAndAnalyzeLabelfield::initSplit(const int nodeToSplit)
     HxUniformScalarField3* inputField = hxconnection_cast<HxUniformScalarField3>(portDistanceMap);
     if (!inputField)
     {
+        theMsg->printf("Please attach a distance map to perform a split");
         return false;
     }
 
@@ -1447,6 +1452,7 @@ HxCorrectAndAnalyzeLabelfield::initSplit(const int nodeToSplit)
         McDArray<int> selectedVertices = m_lineRayCast->getSelectedVertices();
         if (selectedVertices.sizeInt() == 0)
         {
+            theMsg->printf("Select one graph vertex");
             return false;
         }
         labelToSplit = m_nodeToLabel[selectedVertices[0]] + 1;
@@ -1540,7 +1546,7 @@ HxCorrectAndAnalyzeLabelfield::updateInternalStructuresAfterSplit(McDArray<int> 
         m_labelField->lattice().eval(meshVertexId, &currentLabel);
 
         neighbors.clear();
-        m_mesh->get26NeighborHoodOfMeshVertex(meshVertexId, neighbors);
+        m_mesh->get26NeighborHoodOfMeshVertexIgnoringThreshold(meshVertexId, neighbors);
 
         for (int j = 0; j < neighbors.sizeInt(); ++j)
         {
@@ -1615,7 +1621,7 @@ HxCorrectAndAnalyzeLabelfield::splitAtGivenContourTreeNode(const int labelToSpli
 
         neighbors.clear();
         values.clear();
-        m_mesh->getNeighborsOfMeshVertex(increasingOrder, meshVertexId, neighbors, values, SimplicialMesh3DForHexahedralMesh::NEIGHBORHOOD_26);
+        m_mesh->getNeighborsOfMeshVertex(increasingOrder, meshVertexId, neighbors, values);
 
         // Remove nodes of other labels
         for (mclong j = 0; j < neighbors.size(); ++j)
@@ -1713,6 +1719,7 @@ HxCorrectAndAnalyzeLabelfield::twoRegionsContourTreeSplit(const int nodeToSplit)
         McDArray<int> selectedVertices = m_lineRayCast->getSelectedVertices();
         if (selectedVertices.sizeInt() == 0)
         {
+            theMsg->printf("Select one graph vertex");
             return;
         }
         labelToSplit = m_nodeToLabel[selectedVertices[0]] + 1;
@@ -1927,6 +1934,7 @@ HxCorrectAndAnalyzeLabelfield::spectralClusteringSplit(const int nodeToSplit)
         McDArray<int> selectedVertices = m_lineRayCast->getSelectedVertices();
         if (selectedVertices.sizeInt() == 0)
         {
+            theMsg->printf("Select one graph vertex");
             return;
         }
         labelToSplit = m_nodeToLabel[selectedVertices[0]] + 1;
@@ -1936,6 +1944,13 @@ HxCorrectAndAnalyzeLabelfield::spectralClusteringSplit(const int nodeToSplit)
         labelToSplit = m_nodeToLabel[nodeToSplit] + 1;
     }
     const int numberOfLabelNodes = m_sizeOfRegion[labelToSplit];
+
+    const int wishedNumberOfSegments = portIntParameters.getValue(0);
+    if (wishedNumberOfSegments < 2)
+    {
+        theMsg->printf("Write the number of labels you want the selected label to split into (at least 2) in the first <Int Parameters> port.");
+        return;
+    }
 
     if (!m_eng)
     {
@@ -1981,7 +1996,7 @@ HxCorrectAndAnalyzeLabelfield::spectralClusteringSplit(const int nodeToSplit)
         const mculong meshVertexId = m_mesh->getMeshVertexIdx(nodeIdx);
 
         neighbors.clear();
-        m_mesh->get26NeighborHoodOfMeshVertex(meshVertexId, neighbors);
+        m_mesh->get26NeighborHoodOfMeshVertexIgnoringThreshold(meshVertexId, neighbors);
 
         int numberRelevantNeighbors = 0;
 
@@ -2026,7 +2041,6 @@ HxCorrectAndAnalyzeLabelfield::spectralClusteringSplit(const int nodeToSplit)
 
     // Results of eigs are the smallest eigenvalues
     // but they are not sorted (not needed for kmeans)
-    const int wishedNumberOfSegments = portIntParameters.getValue(0);
     theMatlabEng->engPutVariable(m_eng, "v", valuesMxArray);
     theMatlabEng->engPutVariable(m_eng, "i", indicesMxArray1);
     theMatlabEng->engPutVariable(m_eng, "j", indicesMxArray2);
@@ -2062,6 +2076,7 @@ HxCorrectAndAnalyzeLabelfield::spectralClusteringSplitCalculateFullMatrix(const 
         McDArray<int> selectedVertices = m_lineRayCast->getSelectedVertices();
         if (selectedVertices.sizeInt() == 0)
         {
+            theMsg->printf("Select one graph vertex");
             return;
         }
         labelToSplit = m_nodeToLabel[selectedVertices[0]] + 1;
@@ -2071,6 +2086,13 @@ HxCorrectAndAnalyzeLabelfield::spectralClusteringSplitCalculateFullMatrix(const 
         labelToSplit = m_nodeToLabel[nodeToSplit] + 1;
     }
     const int numberOfLabelNodes = m_sizeOfRegion[labelToSplit];
+
+    const int wishedNumberOfSegments = portIntParameters.getValue(0);
+    if (wishedNumberOfSegments < 2)
+    {
+        theMsg->printf("Write the number of labels you want the selected label to split into (at least 2) in the first <Int Parameters> port.");
+        return;
+    }
 
     if (!m_eng)
     {
@@ -2111,7 +2133,7 @@ HxCorrectAndAnalyzeLabelfield::spectralClusteringSplitCalculateFullMatrix(const 
         const mculong meshVertexId = m_mesh->getMeshVertexIdx(nodeIdx);
 
         neighbors.clear();
-        m_mesh->get26NeighborHoodOfMeshVertex(meshVertexId, neighbors);
+        m_mesh->get26NeighborHoodOfMeshVertexIgnoringThreshold(meshVertexId, neighbors);
 
         int numberRelevantNeighbors = 0;
 
@@ -2137,7 +2159,6 @@ HxCorrectAndAnalyzeLabelfield::spectralClusteringSplitCalculateFullMatrix(const 
     }
 
     // Do computations in matlab: Create sparse matrix later
-    const int wishedNumberOfSegments = portIntParameters.getValue(0);
     theMatlabEng->engPutVariable(m_eng, "A", laplaceMatrix);
     theMatlabEng->engEvalString(m_eng, "A = sparse(A);");
     sprintf(str, "[V,D] = eigs(A,%i,0);", wishedNumberOfSegments);
@@ -2226,6 +2247,7 @@ HxCorrectAndAnalyzeLabelfield::standardContourTreeSplit(const int nodeToSplit)
         McDArray<int> selectedVertices = m_lineRayCast->getSelectedVertices();
         if (selectedVertices.sizeInt() == 0)
         {
+            theMsg->printf("Select one graph vertex");
             return;
         }
         labelToSplit = m_nodeToLabel[selectedVertices[0]] + 1;
@@ -2270,7 +2292,7 @@ HxCorrectAndAnalyzeLabelfield::standardContourTreeSplit(const int nodeToSplit)
 
         neighbors.clear();
         values.clear();
-        m_mesh->getNeighborsOfMeshVertex(increasingOrder, meshVertexId, neighbors, values, SimplicialMesh3DForHexahedralMesh::NEIGHBORHOOD_26);
+        m_mesh->getNeighborsOfMeshVertex(increasingOrder, meshVertexId, neighbors, values);
 
         // Remove nodes of other labels
         for (mclong j = 0; j < neighbors.size(); ++j)
@@ -2425,6 +2447,7 @@ HxCorrectAndAnalyzeLabelfield::thresholdingOnSelectedSegments(float threshold)
     McDArray<int> selectedVertices = m_lineRayCast->getSelectedVertices();
     if (selectedVertices.sizeInt() == 0)
     {
+        theMsg->printf("Select at least one graph vertex");
         return;
     }
 

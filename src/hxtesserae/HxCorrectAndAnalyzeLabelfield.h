@@ -226,11 +226,13 @@ private:
     /**
       * Split one label in exactly 2 parts according to the contour tree of the
       * gray values (just on positions with the given label)
+      * If nodeToSplit is -1 the first user-selected graph vertex is split
       */
     void twoRegionsContourTreeSplit(const int nodeToSplit = -1);
     int splitAtGivenContourTreeNode(const int labelToSplit, const int mergeAfterNumberOfNodes, SetUnionDataStructure& setUnion);
     /// Updates label field and calls updateInternalStructuresAfterSplit to update remaining structures
     void setTwoRegionsContourTreeSplitResult(SetUnionDataStructure& setUnion, const int labelToSplit);
+    /// If nodeToSplit is -1 the first user-selected graph vertex is split
     void standardContourTreeSplit(const int nodeToSplit = -1);
     /// Updates label field and calls updateInternalStructuresAfterSplit to update remaining structures
     void setStandardContourtreeSplitResult(const int labelToSplit, SetUnionDataStructure& setUnion);
@@ -246,8 +248,10 @@ private:
 
     // Spectral clustering split
     /// Creates sparse matrix
+    /// If nodeToSplit is -1 the first user-selected graph vertex is split
     void spectralClusteringSplit(const int nodeToSplit = -1);
     /// Deprecated, creates full matrix
+    /// If nodeToSplit is -1 the first user-selected graph vertex is split
     void spectralClusteringSplitCalculateFullMatrix(const int nodeToSplit = -1);
     /// Updates label field and calls updateInternalStructuresAfterSplit to update remaining structures
     void setSpectralClusteringSplitResult(const int labelToSplit);

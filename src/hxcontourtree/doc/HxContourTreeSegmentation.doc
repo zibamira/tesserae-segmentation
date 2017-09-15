@@ -17,7 +17,7 @@ segmented must have larger values than the background.  If this is not the case,
 use the \link{HxArithmetic}{Arithmetic} module to invert the image data.
 
 There is a faster, nearly similar version of this algorithm that can be activated
-with the \link{HxContourTreeSegmentation_fastSegmentation}{Fast watershed segmentation} port.
+with the \link{HxContourTreeSegmentation_fastSegmentation}{Fast segmentation} port.
 Here, the algorithm becomes a hierarchical watershed segmentation (just from high values
 to low values) where the implementation is based on the contour tree.
 

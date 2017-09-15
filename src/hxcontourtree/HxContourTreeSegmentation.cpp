@@ -91,7 +91,7 @@ HxContourTreeSegmentation::HxContourTreeSegmentation()
     portMinimalSegmentSize.setMinMax(0, 1000);
     portMinimalSegmentSize.setValue(50);
 
-    portFastSegmentation.setLabel("Fast Watershed Segmentation");
+    portFastSegmentation.setLabel("Fast Segmentation");
 
     m_outputLabelField = 0;
     m_relativePersistenceValue = 0.05f;
@@ -400,7 +400,7 @@ HxContourTreeSegmentation::calculatePlot()
 
         neighbors.clear();
         values.clear();
-        m_mesh->getNeighborsOfMeshVertex(increasingOrder, meshVertexId, neighbors, values, SimplicialMesh3DForHexahedralMesh::NEIGHBORHOOD_26);
+        m_mesh->getNeighborsOfMeshVertex(increasingOrder, meshVertexId, neighbors, values);
 
         sortNeighbors(neighbors, values, sortedNeighborIds, setUnion);
 
@@ -627,7 +627,7 @@ HxContourTreeSegmentation::computeSegmentation(const float persistenceValue, con
 
         neighbors.clear();
         values.clear();
-        m_mesh->getNeighborsOfMeshVertex(increasingOrder, meshVertexId, neighbors, values, SimplicialMesh3DForHexahedralMesh::NEIGHBORHOOD_26);
+        m_mesh->getNeighborsOfMeshVertex(increasingOrder, meshVertexId, neighbors, values);
 
         sortNeighbors(neighbors, values, sortedNeighborIds, setUnion);
 
@@ -995,7 +995,7 @@ HxContourTreeSegmentation::fastContourTreeSegmentation(const float persistenceVa
         // Look at larger neighbors, sort them according to number of neighbors in current segmentation
         neighbors.clear();
         values.clear();
-        m_mesh->getNeighborsOfMeshVertex(false, meshVertexId, neighbors, values, SimplicialMesh3DForHexahedralMesh::NEIGHBORHOOD_26);
+        m_mesh->getNeighborsOfMeshVertex(false, meshVertexId, neighbors, values);
         sortNeighbors(neighbors, values, sortedNeighborIds, setUnion);
 
         // Merge according to persistance value
