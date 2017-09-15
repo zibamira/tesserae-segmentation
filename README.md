@@ -16,5 +16,5 @@ This source code implements an extension package to the commercial visualization
 Amira. The package can be compiled against Amira 6.3 using the XPand extension.
 
 An archive with supplementary data is available for download from Dryad at
-<DOI TO BE ADDED>.  It includes instructions how use the
+doi:10.5061/dryad.f53s5.  It includes instructions how use the
 software.
